@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Cache-Control" content="no-store">
+  <title>Stock Research | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem('portfolio-theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var mode = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', mode === 'dark');
+      document.documentElement.classList.toggle('dark-mode', mode === 'dark');
+      document.documentElement.classList.toggle('light-mode', mode !== 'dark');
+    })();
+  </script>
+
+  <style>
+:root {
+  --bg: #f8f8f8;
+  --surface: #ffffff;
+  --panel: rgba(255,255,255,.88);
+  --panel-2: #ffffff;
+  --line: #d7ecef;
+  --text: #2e2828;
+  --muted: #667579;
+  --primary: #00b4d8;
+  --accent: #0077b6;
+  --color-gradient-start: #00b4d8;
+  --color-gradient-end: #90e0ef;
+  --chip: #e8f8fb;
+  --gain: #0b8f55;
+  --loss: #c0392b;
+  --shadow: 0 18px 50px rgba(0, 119, 182, .12);
+}
+.dark, .dark-mode {
+  --bg: #131313;
+  --surface: rgba(255,255,255,.06);
+  --panel: rgba(255,255,255,.08);
+  --panel-2: rgba(255,255,255,.1);
+  --line: rgba(255,255,255,.16);
+  --text: #f8f2eb;
+  --muted: #c4b9af;
+  --primary: #f7971e;
+  --accent: #ff4361;
+  --color-gradient-start: #f7971e;
+  --color-gradient-end: #ff4361;
+  --chip: rgba(255,255,255,.1);
+  --gain: #7ddc95;
+  --loss: #ff7d74;
+  --shadow: 0 18px 60px rgba(0, 0, 0, .32);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 16%, transparent), transparent 34rem),
+    var(--bg);
+  font-family: Outfit, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  opacity: 0;
+  padding-top: 80px;
+  animation: fade-in .55s ease forwards;
+}
+a { color: inherit; text-decoration: none; }
+@keyframes fade-in { to { opacity: 1; } }
+
+/* ── NAV ── */
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  height: 80px; padding: 0 clamp(14px, 4vw, 32px);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  border-bottom: 1px solid transparent;
+  backdrop-filter: blur(16px);
+  transition: transform .34s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.topnav.nav-hidden { transform: translateY(-100%); }
+.topnav.nav-scrolled { border-bottom-color: var(--line); box-shadow: 0 12px 35px rgba(0,0,0,.07); }
+.nav-inner {
+  width: min(1300px, 100%); height: 80px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center; gap: 24px;
+}
+.brand { display: inline-flex; align-items: center; gap: 10px; flex: 0 0 auto; font-weight: 750; white-space: nowrap; }
+.brand span {
+  display: inline-grid; place-items: center; width: 32px; height: 32px;
+  border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff;
+}
+.navlinks { display: flex; align-items: center; justify-content: center; gap: 0; flex: 1 1 auto; min-width: 0; }
+.navbar__links {
+  position: relative; display: inline-flex; align-items: center; height: 80px;
+  max-width: 130px; margin-right: clamp(14px, 2vw, 30px); overflow: hidden;
+  color: var(--muted); font-weight: 600; white-space: nowrap;
+  transition: color .2s ease, max-width .4s ease, opacity .4s ease, margin .4s ease;
+}
+.navbar__links::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  background: var(--primary); transform: scaleX(0); transform-origin: center; transition: transform .22s ease;
+}
+.navbar__links.highlight::after, .navbar__links:hover::after { transform: scaleX(1); }
+.navbar__links.highlight, .navbar__links:hover { color: var(--primary); }
+.navbar__links.collapsed { width: 0; max-width: 0; opacity: 0; margin-right: 0; pointer-events: none; }
+.nav-actions { display: inline-flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.theme-toggle { position: relative; }
+.theme-toggle__input { position: absolute; opacity: 0; width: 0; height: 0; }
+.theme-toggle__label {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--muted); font-size: 14px;
+}
+.theme-toggle__label:hover { color: var(--text); border-color: var(--primary); }
+.theme-toggle__label .fa-sun { display: none; }
+.light-mode .theme-toggle__label .fa-sun { display: inline; }
+.light-mode .theme-toggle__label .fa-moon { display: none; }
+
+/* ── PAGE HEADER ── */
+main { max-width: 1100px; margin: 0 auto; padding: 48px clamp(16px, 4vw, 32px) 80px; }
+.page-header { margin-bottom: 48px; }
+.page-header .eyebrow {
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--primary); margin: 0 0 12px;
+}
+.page-header h1 { font-size: clamp(28px, 6vw, 44px); font-weight: 800; margin: 0 0 12px; }
+.page-header p { font-size: 16px; color: var(--muted); margin: 0; max-width: 560px; line-height: 1.65; }
+
+/* ── RESEARCH GRID ── */
+.research-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.research-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+  padding: 24px; display: flex; flex-direction: column; gap: 14px;
+  box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  cursor: pointer;
+}
+.research-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 60px rgba(0,0,0,.14);
+  border-color: var(--primary);
+}
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ticker-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; font-weight: 800; font-size: 15px; padding: 5px 14px; border-radius: 999px;
+  letter-spacing: .02em;
+}
+.verdict-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  white-space: nowrap;
+}
+.verdict-hold {
+  background: color-mix(in srgb, #f59e0b 15%, transparent);
+  color: #c57f00;
+  border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+}
+.card-company { font-size: 20px; font-weight: 800; }
+.card-subtitle { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.card-metrics { display: flex; gap: 20px; flex-wrap: wrap; }
+.card-metric { }
+.card-metric .label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.card-metric .val { font-size: 17px; font-weight: 800; }
+.card-metric .val.down { color: var(--loss); }
+.card-metric .val.up { color: var(--gain); }
+.card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--line); }
+.card-date { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.card-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 700; color: var(--primary);
+}
+.card-cta i { transition: transform .2s ease; }
+.research-card:hover .card-cta i { transform: translateX(4px); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--muted);
+  border: 2px dashed var(--line); border-radius: 18px; font-size: 15px;
+}
+
+/* ── FOOTER ── */
+footer { text-align: center; padding: 24px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 48px; }
+
+@media (max-width: 640px) {
+  .research-grid { grid-template-columns: 1fr; }
+}
+  </style>
+</head>
+<body data-active-page="research">
+  <nav class="topnav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html"><span>CR</span> Portfolio</a>
+      <div class="navlinks">
+        <a class="navbar__links navbar__link" data-nav-key="index" data-priority="0" href="index.html">Home</a>
+        <a class="navbar__links navbar__link" data-nav-key="holdings" data-priority="1" href="holdings.html">Holdings</a>
+        <a class="navbar__links navbar__link" data-nav-key="tax" data-priority="2" href="tax-lots.html">Tax Lots</a>
+        <a class="navbar__links navbar__link" data-nav-key="realized" data-priority="3" href="realized.html">Realized P/L</a>
+        <a class="navbar__links navbar__link" data-nav-key="sell" data-priority="4" href="sell-planner.html">Sell Planner</a>
+        <a class="navbar__links navbar__link" data-nav-key="quality" data-priority="5" href="trade-quality.html">Trade Quality</a>
+        <a class="navbar__links navbar__link" data-nav-key="spend" data-priority="6" href="spend.html">Spend</a>
+        <a class="navbar__links navbar__link highlight active" data-nav-key="research" data-priority="7" href="stock-research.html">Research</a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle">
+          <input class="theme-toggle__input" id="themeToggle" type="checkbox" aria-label="Toggle light mode">
+          <label class="theme-toggle__label" for="themeToggle"><i class="fa-solid fa-sun"></i><i class="fa-solid fa-moon"></i></label>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <p class="eyebrow"><i class="fa-solid fa-magnifying-glass-chart"></i> Deep Dives</p>
+      <h1>Stock Research</h1>
+      <p>Multi-perspective research reports on individual stocks — buy/hold/sell analysis with source confidence scores.</p>
+    </header>
+
+    <div class="research-grid">
+
+      <!-- NETFLIX CARD -->
+      <a class="research-card" href="stock-research-netflix.html">
+        <div class="card-top">
+          <span class="ticker-pill"><i class="fa-solid fa-play"></i> NFLX</span>
+          <span class="verdict-pill verdict-hold"><i class="fa-solid fa-scale-balanced"></i> Hold / Constructive</span>
+        </div>
+        <div class="card-company">Netflix</div>
+        <div class="card-subtitle">
+          Post 10-for-1 split, trading ~42% off its 52-week high. Ad ramp is real; fill rate (~45%) is the key variable.
+          Rate-driven multiple compression dominates the drawdown story.
+        </div>
+        <div class="card-metrics">
+          <div class="card-metric">
+            <div class="label">Price (split-adj.)</div>
+            <div class="val down">~$77</div>
+          </div>
+          <div class="card-metric">
+            <div class="label">P/E</div>
+            <div class="val">26×</div>
+          </div>
+          <div class="card-metric">
+            <div class="label">Analyst Target</div>
+            <div class="val up">~$114</div>
+          </div>
+          <div class="card-metric">
+            <div class="label">Op. Margin</div>
+            <div class="val up">32.3%</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-date"><i class="fa-regular fa-calendar"></i> June 21, 2026</span>
+          <span class="card-cta">Read report <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>Research reports are for educational purposes only. Not financial advice.</footer>
+
+  <script>
+    (function () {
+      var nav = document.querySelector('.topnav');
+      var themeInput = document.getElementById('themeToggle');
+      var lastScrollY = window.scrollY;
+      function setTheme(mode) {
+        var isDark = mode === 'dark';
+        document.documentElement.classList.toggle('dark', isDark);
+        document.documentElement.classList.toggle('dark-mode', isDark);
+        document.documentElement.classList.toggle('light-mode', !isDark);
+        if (themeInput) themeInput.checked = !isDark;
+        localStorage.setItem('portfolio-theme', isDark ? 'dark' : 'light');
+      }
+      if (themeInput) {
+        themeInput.checked = document.documentElement.classList.contains('light-mode');
+        themeInput.addEventListener('change', function () {
+          setTheme(themeInput.checked ? 'light' : 'dark');
+        });
+      }
+      window.addEventListener('scroll', function () {
+        var y = window.scrollY;
+        if (y > 60) nav.classList.add('nav-scrolled'); else nav.classList.remove('nav-scrolled');
+        if (y > lastScrollY + 8 && y > 120) nav.classList.add('nav-hidden'); else if (y < lastScrollY - 8) nav.classList.remove('nav-hidden');
+        lastScrollY = y;
+      }, { passive: true });
+    })();
+  </script>
+</body>
+</html>
